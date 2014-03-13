@@ -29,7 +29,13 @@ module Sinatra
         return unless request.env['HTTP_ORIGIN']
         settings.set hash if hash
 
-        origin = settings.allow_origin == :any ? request.env['HTTP_ORIGIN'] : settings.allow_origin
+        if settings.allow_origin.is_a? Array
+          origin = request.env['HTTP_ORIGIN']
+          origin = nil unless settings.allow_origin.include? origin
+        else
+          origin = settings.allow_origin == :any ? request.env['HTTP_ORIGIN'] : settings.allow_origin
+        end
+
         methods = settings.allow_methods.map{ |m| m.to_s.upcase! }.join(', ')
 
         headers_list = {
